@@ -4,3 +4,5 @@
 /terraform.tfstate
 /terraform.tfstate.*
 
+/output/config.env
+kubeconfig

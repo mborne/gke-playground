@@ -25,8 +25,6 @@ Les paramètres sont spécifiés dans le fichier [variables.tf](variables.tf). L
 | Nom          | Description                        | Valeur par défaut |
 | ------------ | ---------------------------------- | ----------------- |
 | `PROJECT_ID` | Identifiant du projet Google Cloud | NA (**requise**)  |
-| `ZONE`       | Identifiant du projet Google Cloud | `us-central1`     |
-| `REGION`     | Identifiant du projet Google Cloud | `us-central1-c`   |
 
 Pour les autres paramètres disponibles, il est possible d'utiliser par exemple :
 

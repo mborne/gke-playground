@@ -18,7 +18,7 @@ variable "zone_name" {
 
 variable "gke_node_type" {
   type    = string
-  default = "e2-medium"
+  default = "e2-micro"
   description = "Le dimensionnement des noeuds du cluster Kubernetes"
 }
 
