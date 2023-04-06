@@ -27,3 +27,4 @@ variable "gke_node_count" {
   default = 3
   description = "Le nombre de noeuds dans le cluster Kubernetes"
 }
+

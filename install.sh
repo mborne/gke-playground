@@ -26,9 +26,10 @@ echo "--------------------------------------------------------------------------
 
 # Pour le stockage de l'état terraform dans un bucket (non traité ici)
 # gcloud services enable storage.googleapis.com --project=$PROJECT_ID
-# Pour GKE
+# Kubernetes Engine API
 gcloud services enable container.googleapis.com --project=$PROJECT_ID
-
+# Cloud Filestore API pour le stockage RWX (NFS managé)
+gcloud services enable file.googleapis.com --project=$PROJECT_ID
 
 echo "------------------------------------------------------------------------------------------------"
 echo "-- Déploiement dans ${PROJECT_ID} avec ZONE=$ZONE et REGION=$REGION ..."
