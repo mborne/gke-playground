@@ -31,6 +31,20 @@ gcloud services enable container.googleapis.com --project=$PROJECT_ID
 # Cloud Filestore API pour le stockage RWX (NFS managé)
 gcloud services enable file.googleapis.com --project=$PROJECT_ID
 
+#------------------------------------------------------------------------
+# Création du bucket de stockage de l'état terraform s'il n'existe pas
+# (variables non autorisées dans backend.bucket)
+#------------------------------------------------------------------------
+BUCKET_NAME=${PROJECT_ID}-tf-state
+gcloud storage buckets describe gs://${BUCKET_NAME} || {
+    gcloud storage buckets create gs://${BUCKET_NAME} --public-access-prevention
+}
+
+sleep 5
+
+# Configuration du stockage d'état terraform
+envsubst < backend.tf.dist > backend.tf
+
 echo "------------------------------------------------------------------------------------------------"
 echo "-- Déploiement dans ${PROJECT_ID} avec ZONE=$ZONE et REGION=$REGION ..."
 echo "------------------------------------------------------------------------------------------------"
