@@ -24,8 +24,8 @@ echo "--------------------------------------------------------------------------
 echo "-- Activation des services Google Cloud ..."
 echo "------------------------------------------------------------------------------------------------"
 
-# Pour le stockage de l'état terraform dans un bucket (non traité ici)
-# gcloud services enable storage.googleapis.com --project=$PROJECT_ID
+# Pour le stockage de l'état terraform dans un bucket
+gcloud services enable storage.googleapis.com --project=$PROJECT_ID
 # Kubernetes Engine API
 gcloud services enable container.googleapis.com --project=$PROJECT_ID
 # Cloud Filestore API pour le stockage RWX (NFS managé)
@@ -63,5 +63,23 @@ echo "--------------------------------------------------------------------------
 echo "-- Utilisation du cluster :"
 echo "------------------------------------------------------------------------------------------------"
 echo "source output/config.env"
+source output/config.env
 echo 'gcloud container clusters get-credentials gke-cluster-primary --project=$PROJECT_ID --zone=$ZONE'
+gcloud container clusters get-credentials gke-cluster-primary --project=$PROJECT_ID --zone=$ZONE
 echo 'kubectl get nodes'
+kubectl get nodes
+
+
+echo "------------------------------------------------------------------------------------------------"
+echo "-- Installation des services supports"
+echo "------------------------------------------------------------------------------------------------"
+
+cd nfs-provisioner
+bash k8s-install.sh
+cd ..
+
+cd traefik
+bash k8s-install.sh
+cd ..
+
+

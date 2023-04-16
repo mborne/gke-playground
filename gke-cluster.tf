@@ -18,7 +18,7 @@ resource "google_container_cluster" "primary" {
     # Activation CSI FileStore pour classe de stockage RWX
     # ATTENTION : Une instance par PVC avec 1To minimum et coût non négligeable.
     gcp_filestore_csi_driver_config {
-        enabled = true
+      enabled = true
     }
   }
 }
@@ -38,7 +38,7 @@ resource "google_container_node_pool" "primary_preemptible_nodes" {
     # Utilisation du compte de service dédié aux noeuds
     service_account = google_service_account.default.email
 
-    oauth_scopes    = [
+    oauth_scopes = [
       "https://www.googleapis.com/auth/cloud-platform"
     ]
   }

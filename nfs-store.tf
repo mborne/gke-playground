@@ -3,26 +3,17 @@
 #
 # https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/filestore_instance
 resource "google_filestore_instance" "nfs_instance" {
-  name = "nfs-instance"
+  name     = "nfs-instance"
   location = var.zone_name
-  tier = "STANDARD"
+  tier     = "STANDARD"
 
   file_shares {
     capacity_gb = 1024
-    name        = "share1"
+    name        = "gke_share"
   }
 
   networks {
     network = "default"
     modes   = ["MODE_IPV4"]
   }
-}
-
-output "nfs_instance_ip" {
-  value = "${google_filestore_instance.nfs_instance.networks.0.ip_addresses.0}"
-  description = "The private IP address of the NFS instance"
-
-  depends_on = [
-    google_filestore_instance.nfs_instance
-  ]
 }
