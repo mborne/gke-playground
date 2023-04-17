@@ -55,5 +55,7 @@ kubectl get nodes
 kubectl get namespaces
 ```
 
+## License
 
+[MIT](LICENSE)
 
