@@ -37,7 +37,7 @@ gcloud services enable file.googleapis.com --project=$PROJECT_ID
 #------------------------------------------------------------------------
 BUCKET_NAME=${PROJECT_ID}-tf-state
 gcloud storage buckets describe gs://${BUCKET_NAME} || {
-    gcloud storage buckets create gs://${BUCKET_NAME} --public-access-prevention
+    gcloud storage buckets create gs://${BUCKET_NAME} --public-access-prevention --project=$PROJECT_ID
 }
 
 sleep 5

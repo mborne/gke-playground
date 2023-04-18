@@ -21,6 +21,6 @@ helm -n nfs-provisioner upgrade --install nfs-subdir-external-provisioner nfs-su
     --set nfs.server=${NFS_SERVER_IP} \
     --set nfs.path=/gke_share \
     --set storageClass.accessModes=ReadWriteMany \
-    --set storageClass.name=nfs-client
+    --set storageClass.name=nfs-legacy
 
 
