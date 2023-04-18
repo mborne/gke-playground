@@ -14,13 +14,13 @@ resource "google_container_cluster" "primary" {
   remove_default_node_pool = true
   initial_node_count       = 1
 
-  addons_config {
-    # Activation CSI FileStore pour classe de stockage RWX
-    # ATTENTION : Une instance par PVC avec 1To minimum et coût non négligeable.
-    gcp_filestore_csi_driver_config {
-      enabled = true
-    }
-  }
+  # addons_config {
+  #   # Activation CSI FileStore pour classe de stockage RWX
+  #   # ATTENTION : Une instance par PVC avec 1To minimum et coût non négligeable.
+  #   gcp_filestore_csi_driver_config {
+  #     enabled = true
+  #   }
+  # }
 }
 
 
