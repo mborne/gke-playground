@@ -46,7 +46,7 @@ sleep 5
 envsubst < backend.tf.dist > backend.tf
 
 echo "------------------------------------------------------------------------------------------------"
-echo "-- Déploiement dans ${PROJECT_ID} avec ZONE=$ZONE et REGION=$REGION ..."
+echo "-- Déploiement dans ${PROJECT_ID} ..."
 echo "------------------------------------------------------------------------------------------------"
 
 terraform init
