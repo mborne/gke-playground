@@ -42,14 +42,11 @@ gcloud storage buckets describe gs://${BUCKET_NAME} || {
 
 sleep 5
 
-# Configuration du stockage d'état terraform
-envsubst < backend.tf.dist > backend.tf
-
 echo "------------------------------------------------------------------------------------------------"
 echo "-- Déploiement dans ${PROJECT_ID} ..."
 echo "------------------------------------------------------------------------------------------------"
 
-terraform init
+terraform init -backend-config="bucket=${PROJECT_ID}-tf-state"
 terraform plan
 terraform apply -auto-approve
 

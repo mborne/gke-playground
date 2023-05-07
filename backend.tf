@@ -1,6 +1,6 @@
 terraform {
   backend "gcs" {
-    bucket = "${PROJECT_ID}-tf-state"
+    # bucket = "${PROJECT_ID}-tf-state"
     prefix = "terraform/gke-playground"
   }
 }

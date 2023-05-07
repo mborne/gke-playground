@@ -3,7 +3,6 @@
 /.terraform.lock*
 /terraform.tfstate
 /terraform.tfstate.*
-/backend.tf
 
 /output/config.env
 kubeconfig
