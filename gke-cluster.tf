@@ -1,8 +1,7 @@
-# Création d'un compte de service dédié pour les noeuds
-# (recommandé par google)
-resource "google_service_account" "default" {
-  account_id   = "gke-service-account"
-  display_name = "Service Account for GKE"
+# Récupération du compte de service par défaut Compute Engine Service Account pour les noeuds
+# (roles/monitoring.metricWriter et roles/logging.logWriter requis, non assignable avec 
+# google_project_iam_binding avec acloudguru)
+data "google_compute_default_service_account" "default" {
 }
 
 # Création du cluster Kubernetes
@@ -13,6 +12,15 @@ resource "google_container_cluster" "primary" {
   # Création d'un nombre minimal de noeud en vue de créer des pools séparés
   remove_default_node_pool = true
   initial_node_count       = 1
+
+  # logging_service          = "logging.googleapis.com/kubernetes"
+  # monitoring_service       = "monitoring.googleapis.com/kubernetes"
+  logging_config {
+    enable_components = ["SYSTEM_COMPONENTS", "WORKLOADS"]
+  }
+  monitoring_config {
+    enable_components = ["SYSTEM_COMPONENTS"]
+  }
 }
 
 
@@ -27,8 +35,7 @@ resource "google_container_node_pool" "primary_preemptible_nodes" {
     preemptible  = true
     machine_type = var.gke_node_type
 
-    # Utilisation du compte de service dédié aux noeuds
-    service_account = google_service_account.default.email
+    service_account = data.google_compute_default_service_account.default.email
 
     oauth_scopes = [
       "https://www.googleapis.com/auth/cloud-platform"
