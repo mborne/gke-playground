@@ -4,6 +4,14 @@ terraform {
       source  = "hashicorp/google"
       version = ">=4.65"
     }
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = ">=2.20"
+    }
+    helm = {
+      source  = "hashicorp/helm"
+      version = ">=2.9"
+    }
   }
 }
 
@@ -12,17 +20,12 @@ provider "google" {
   region  = var.region_name
 }
 
-data "google_client_config" "provider" {}
+provider "kubernetes" {
+  config_path = "./output/kubeconfig"
+}
 
-# data "google_container_cluster" "my_cluster" {
-#   name     = var.gke_cluster_name
-#   location = var.zone_name
-# }
-
-# provider "kubernetes" {
-#   host  = "https://${data.google_container_cluster.my_cluster.endpoint}"
-#   token = data.google_client_config.provider.access_token
-#   cluster_ca_certificate = base64decode(
-#     data.google_container_cluster.my_cluster.master_auth[0].cluster_ca_certificate,
-#   )
-# }
+provider "helm" {
+  kubernetes {
+    config_path = "./output/kubeconfig"
+  }
+}

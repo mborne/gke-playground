@@ -1,36 +1,44 @@
-data "google_client_config" "default" {
-  depends_on = [google_container_cluster.primary]
-}
-
 output "kubeconfig" {
   value = yamlencode({
-    apiVersion      = "v1"
-    kind            = "Config"
-    current-context = var.cluster_name
-    clusters = [{
-      name = var.cluster_name
-      cluster = {
-        certificate-authority-data = google_container_cluster.primary.master_auth[0].cluster_ca_certificate
-        server                     = google_container_cluster.primary.endpoint
+    apiVersion = "v1"
+    kind       = "Config"
+    preferences = {
+      colors = true
+    }
+    current-context = google_container_cluster.primary.name
+    contexts = [
+      {
+        name = google_container_cluster.primary.name
+        context = {
+          cluster   = google_container_cluster.primary.name
+          user      = data.google_compute_default_service_account.default.email
+          namespace = "default"
+        }
       }
-    }]
-    contexts = [{
-      name = var.cluster_name
-      context = {
-        cluster = var.cluster_name
-        user    = var.cluster_name
+    ]
+    clusters = [
+      {
+        name = google_container_cluster.primary.name
+        cluster = {
+          server                     = "https://${google_container_cluster.primary.endpoint}"
+          certificate-authority-data = google_container_cluster.primary.master_auth[0].cluster_ca_certificate
+        }
       }
-    }]
-    users = [{
-      name = var.cluster_name
-      user = {
-        token = data.google_client_config.default.access_token
+    ]
+    users = [
+      {
+        name = data.google_compute_default_service_account.default.email
+        user = {
+          exec = {
+            apiVersion         = "client.authentication.k8s.io/v1beta1"
+            command            = "gke-gcloud-auth-plugin"
+            interactiveMode    = "Never"
+            provideClusterInfo = true
+          }
+        }
       }
-    }]
+    ]
   })
-}
 
-# resource "local_file" "kubeconfig" {
-#   content  = local.kubeconfig
-#   filename = "${path.module}/kubeconfig"
-# }
+  depends_on = [google_container_cluster.primary]
+}

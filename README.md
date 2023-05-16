@@ -14,19 +14,20 @@ gcloud auth application-default login
 
 ## Principe de fonctionnement
 
-* [provider.tf](provider.tf) spécifie l'utilisation du plugin terraform [Google Cloud Platform Provider](https://registry.terraform.io/providers/hashicorp/google/latest/docs)
+* [provider.tf](provider.tf) configure les [modules Terraform](https://registry.terraform.io/browse/providers) :
+  * [Google Cloud](https://registry.terraform.io/providers/hashicorp/google/latest/docs)
+  * [Kubernetes](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs)
+  * [Helm](https://registry.terraform.io/providers/hashicorp/helm/latest/docs)
 * [gke-cluster.tf](gke-cluster.tf) créé un cluster Kubernetes **gke-cluster-primary**
 
 Pour la mise en oeuvre RWX :
 
 * [nfs-server.tf](nfs-server.tf) assure la création d'un serveur NFS (**nfs-server**)
-* [nfs-provisioner/k8s-install.sh](nfs-provisioner/k8s-install.sh) installe [NFS Subdirectory External Provisioner](https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/) pour l'utiliser dans le cluster via la classe de stockage **nfs-legacy**
+* [gke-rwx.tf](gke-rwx.tf) installe [NFS Subdirectory External Provisioner](https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/) pour l'utiliser dans le cluster via la classe de stockage **nfs-legacy**
 
 Pour l'exposition de service en HTTPS :
 
-* [lb-address.tf](lb-address.tf) permet de réserver une IP publique qui sera utilisée pour l'exposition.  
-* [traefik/k8s-install.sh](traefik/k8s-install.sh) déploie [Traefik](https://github.com/traefik/traefik#overview) en temps que contrôleur ingress avec la classe `traefik` et un résolveur `letsencrypt` (voir [traefik/values.yaml](traefik/values.yaml) et noter l'utilisation de la classe "nfs-legacy")
-
+* [gke-lb.tf](gke-lb.tf) déploie [Traefik](https://github.com/traefik/traefik#overview) en temps que contrôleur ingress avec la classe `traefik` et un résolveur `letsencrypt`.
 
 ## Paramétrage
 
