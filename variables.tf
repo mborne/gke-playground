@@ -16,6 +16,12 @@ variable "zone_name" {
   description = "La zone de déploiement des services (ex : us-central1-c)"
 }
 
+variable "gke_cluster_name" {
+  type        = string
+  default     = "gke-cluster-primary"
+  description = "Le nom du cluster Kubernetes"
+}
+
 variable "gke_node_type" {
   type        = string
   default     = "e2-micro"
