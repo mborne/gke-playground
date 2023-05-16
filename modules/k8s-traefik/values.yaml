@@ -12,7 +12,7 @@ podSecurityContext:
   fsGroup: 65532
 
 ingressClass:
-  enabled: true
+  #enabled: true
   isDefaultClass: false
 
 # Enable persistence using Persistent Volume Claims to persist TLS certificates.
@@ -27,10 +27,8 @@ persistence:
 
 certResolvers:
   letsencrypt:
-    # for challenge options cf. https://doc.traefik.io/traefik/https/acme/
     email: admin@quadtreeworld.net
     tlsChallenge: true
     httpChallenge:
       entryPoint: "web"
-    # match the path to persistence
     storage: /data/acme.json

@@ -1,44 +1,18 @@
-# Récupération du compte de service par défaut Compute Engine Service Account pour les noeuds
-# (roles/monitoring.metricWriter et roles/logging.logWriter requis, non assignable avec 
-# google_project_iam_binding avec acloudguru)
-data "google_compute_default_service_account" "default" {
+module "gke_cluster" {
+  source = "./modules/gke-cluster"
+
+  zone_name    = var.zone_name
+  cluster_name = var.gke_cluster_name
+  node_type    = var.gke_node_type
+  node_count   = var.gke_node_count
 }
 
-# Création du cluster Kubernetes
-resource "google_container_cluster" "primary" {
-  name     = "gke-cluster-primary"
-  location = var.zone_name
+resource "local_file" "kubeconfig" {
+  content         = module.gke_cluster.kubeconfig
+  filename        = "${path.module}/output/kubeconfig"
+  file_permission = 0600
 
-  # Création d'un nombre minimal de noeud en vue de créer des pools séparés
-  remove_default_node_pool = true
-  initial_node_count       = 1
-
-  # logging_service          = "logging.googleapis.com/kubernetes"
-  # monitoring_service       = "monitoring.googleapis.com/kubernetes"
-  logging_config {
-    enable_components = ["SYSTEM_COMPONENTS", "WORKLOADS"]
-  }
-  monitoring_config {
-    enable_components = ["SYSTEM_COMPONENTS"]
-  }
+  depends_on = [module.gke_cluster.kubeconfig]
 }
 
 
-# Création d'un pool de noeud pour le cluster Kubernetes
-resource "google_container_node_pool" "primary_preemptible_nodes" {
-  name       = "default-node-pool"
-  location   = var.zone_name
-  cluster    = google_container_cluster.primary.name
-  node_count = var.gke_node_count
-
-  node_config {
-    preemptible  = true
-    machine_type = var.gke_node_type
-
-    service_account = data.google_compute_default_service_account.default.email
-
-    oauth_scopes = [
-      "https://www.googleapis.com/auth/cloud-platform"
-    ]
-  }
-}
