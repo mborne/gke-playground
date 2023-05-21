@@ -34,14 +34,14 @@ resource "google_container_cluster" "primary" {
 
 
 # Création d'un pool de noeud pour le cluster Kubernetes
-resource "google_container_node_pool" "primary_preemptible_nodes" {
+resource "google_container_node_pool" "default" {
   name       = "default-node-pool"
   location   = var.zone_name
   cluster    = google_container_cluster.primary.name
   node_count = var.node_count
 
   node_config {
-    preemptible  = true
+    preemptible  = false
     machine_type = var.node_type
 
     service_account = data.google_compute_default_service_account.default.email

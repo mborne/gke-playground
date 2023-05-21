@@ -1,8 +1,9 @@
-/.terraform/
-/.terraform.*
-/.terraform.lock*
-/terraform.tfstate
-/terraform.tfstate.*
+.terraform/
+.terraform.*
+.terraform.lock*
+terraform.tfstate
+terraform.tfstate.*
 
 /output/*
+/.vscode/
 

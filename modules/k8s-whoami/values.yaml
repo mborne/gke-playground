@@ -1,0 +1,16 @@
+replicaCount: 3
+
+ingress:
+  enabled: true
+  className: "traefik"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-http"
+  hosts:
+    - host: whoami.gke.quadtreeworld.net
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+  - hosts:
+    - whoami.gke.quadtreeworld.net
+    secretName: whoami-cert

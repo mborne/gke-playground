@@ -24,48 +24,32 @@ echo "--------------------------------------------------------------------------
 echo "-- Activation des services Google Cloud ..."
 echo "------------------------------------------------------------------------------------------------"
 
-# Pour le stockage de l'état terraform dans un bucket
-gcloud services enable storage.googleapis.com --project=$PROJECT_ID
 # Kubernetes Engine API
 gcloud services enable container.googleapis.com --project=$PROJECT_ID
 # Cloud Filestore API pour le stockage RWX (NFS managé)
 gcloud services enable file.googleapis.com --project=$PROJECT_ID
 
-#------------------------------------------------------------------------
-# Création du bucket de stockage de l'état terraform s'il n'existe pas
-# (variables non autorisées dans backend.bucket)
-#------------------------------------------------------------------------
-BUCKET_NAME=${PROJECT_ID}-tf-state
-gcloud storage buckets describe gs://${BUCKET_NAME} || {
-    gcloud storage buckets create gs://${BUCKET_NAME} --public-access-prevention --project=$PROJECT_ID
-}
-
-sleep 5
 
 echo "------------------------------------------------------------------------------------------------"
 echo "-- Déploiement dans ${PROJECT_ID} ..."
 echo "------------------------------------------------------------------------------------------------"
 
-terraform init -backend-config="bucket=${PROJECT_ID}-tf-state"
-terraform plan
+cd 01-gke
+terraform init
 terraform apply -auto-approve
+cd ..
 
-echo "------------------------------------------------------------------------------------------------"
-echo "-- Export de la configuration"
-echo "------------------------------------------------------------------------------------------------"
-echo "# output/config.env :"
-cat output/config.env
+cd 02-rwx
+terraform init
+terraform apply -auto-approve
+cd ..
 
-echo "------------------------------------------------------------------------------------------------"
-echo "-- Utilisation du cluster :"
-echo "------------------------------------------------------------------------------------------------"
-echo "source output/config.env"
-source output/config.env
+cd 03-lb
+terraform init
+terraform apply -auto-approve
+cd ..
 
-# echo 'gcloud container clusters get-credentials gke-cluster-primary --project=$PROJECT_ID --zone=$ZONE'
-# gcloud container clusters get-credentials gke-cluster-primary --project=$PROJECT_ID --zone=$ZONE
-
-export KUBECONFIG=$PWD/output/kubeconfig
-echo 'kubectl get nodes'
-kubectl get nodes
-
+cd 04-dns
+terraform init
+terraform apply -auto-approve
+cd ..

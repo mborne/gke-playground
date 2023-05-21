@@ -4,9 +4,16 @@ resource "google_compute_address" "lb_address" {
 }
 
 module "traefik" {
-  source = "./modules/k8s-traefik"
+  source = "../modules/k8s-traefik"
 
   load_balancer_ip = google_compute_address.lb_address.address
-
-  depends_on = [local_file.kubeconfig]
 }
+
+module "cert_manager" {
+  source = "../modules/k8s-cert-manager"
+}
+
+module "whoami" {
+  source = "../modules/k8s-whoami"
+}
+
