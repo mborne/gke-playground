@@ -7,13 +7,13 @@ variable "project_id" {
 variable "region_name" {
   type        = string
   default     = "us-central1"
-  description = "La region de déploiement des services (ex : us-central1)"
+  description = "La region de déploiement du cluster Kubernetes"
 }
 
 variable "zone_name" {
   type        = string
   default     = "us-central1-c"
-  description = "La zone de déploiement des services (ex : us-central1-c)"
+  description = "La zone de déploiement du cluster Kubernetes"
 }
 
 variable "gke_cluster_name" {

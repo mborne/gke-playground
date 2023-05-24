@@ -1,10 +1,21 @@
 # gke-playground
 
+Expérimentation avec Terraform pour création d'un environnement de développement Kubernetes dans Google Cloud :
+
+![docs/schema.drawio.png](docs/schema.drawio.png)
+
+## Mise en garde
+
+* Testé uniquement avec des bac à sable Google Cloud de [acloud.guru](https://learn.acloud.guru/).
+* Le stockage de l'état Terraform n'est pas traité (voir [backend GCS](https://developer.hashicorp.com/terraform/language/settings/backends/gcs))
+* La segmentation réseau (VPC) n'est pas traitée.
+* Les sauvegardes ne sont pas traitées.
+
 ## Pré-requis
 
 * Installer [gcloud](https://cloud.google.com/sdk/docs/install) (`gcloud --help`)
 * Installer [terraform](https://developer.hashicorp.com/terraform/downloads) (`terraform version`)
-* Se connecter sur un compte Google Cloud : https://console.cloud.google.com/
+* Se connecter sur un compte Google Cloud sur la console : https://console.cloud.google.com/
 * Se connecter avec gcloud :
 
 ```bash
@@ -12,46 +23,30 @@ gcloud auth login
 gcloud auth application-default login
 ```
 
-## Principe de fonctionnement
+## Principe du déploiement
 
-* [provider.tf](provider.tf) configure les [modules Terraform](https://registry.terraform.io/browse/providers) :
-  * [Google Cloud](https://registry.terraform.io/providers/hashicorp/google/latest/docs)
-  * [Kubernetes](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs)
-  * [Helm](https://registry.terraform.io/providers/hashicorp/helm/latest/docs)
-* [gke-cluster.tf](gke-cluster.tf) créé un cluster Kubernetes **gke-cluster-primary**
+Le déploiement est réalisé en plusieurs étapes :
 
-Pour la mise en oeuvre RWX :
+* [01-gke](01-gke) : Création du cluster Kubernetes et la production d'un fichier `gke-playground/output/kubeconfig.yml`
+* [02-rwx](02-rwx) : Création d'une instance Google FileStore ("nfs-server") et de la classe de stockage RWX associée ("nfs-legacy")
+* [03-lb](03-rwx) : Déploiement de [Traefik](https://doc.traefik.io/traefik/) avec une IP réservée ("lb-address") et de [cert-manager](https://cert-manager.io/)
+* [04-dns](04-dns) : Configuration du DNS CloudFlare (résolution de `*.gke.{domain}` sur l'IP réservée "{lb-address}")
 
-* [nfs-server.tf](nfs-server.tf) assure la création d'un serveur NFS (**nfs-server**)
-* [gke-rwx.tf](gke-rwx.tf) installe [NFS Subdirectory External Provisioner](https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/) pour l'utiliser dans le cluster via la classe de stockage **nfs-legacy**
+## Déployer l'environnement de développement
 
-Pour l'exposition de service en HTTPS :
-
-* [gke-lb.tf](gke-lb.tf) déploie [Traefik](https://github.com/traefik/traefik#overview) en temps que contrôleur ingress avec la classe `traefik` et un résolveur `letsencrypt`.
-
-## Paramétrage
-
-Les paramètres sont spécifiés dans le fichier [variables.tf](variables.tf). Le script [install.sh](install.sh) simplifie le passage et le contrôle des paramètres suivants :
-
-| Nom          | Description                        | Valeur par défaut |
-| ------------ | ---------------------------------- | ----------------- |
-| `PROJECT_ID` | Identifiant du projet Google Cloud | NA (**requise**)  |
-
-Pour les autres paramètres disponibles, il est possible d'utiliser par exemple :
-
-```bash
-export TF_VAR_gke_node_type=e2-micro
-export TF_VAR_gke_node_count=5
-```
-
-## Utilisation
+Voir script [install.sh](install.sh) qui assure l'appel de `terraform apply -auto-approve` sur chacun des dossiers avec contrôle et passage des paramètres :
 
 ```bash
 # Avec un projet acloudguru
 export PROJECT_ID=playground-s-11-946429c5
 # Création de l'infrastructure avec terraform
+# (NB : PROJECT_ID sera traduit en TF_VAR_project_id)
 bash install.sh
+```
 
+## Utiliser l'environnement de développement
+
+```bash
 # Pour inspecter le résultat en ligne de commande :
 gcloud container clusters list --project=$PROJECT_ID
 gcloud compute addresses list --project=$PROJECT_ID
@@ -65,6 +60,7 @@ kubectl cluster-info
 kubectl get nodes
 kubectl get namespaces
 ```
+
 
 ## License
 

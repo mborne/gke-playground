@@ -3,7 +3,7 @@
 #
 # https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/filestore_instance
 resource "google_filestore_instance" "nfs_server" {
-  name     = "nfs-instance"
+  name     = "nfs-server"
   location = var.zone_name
   tier     = "STANDARD"
 
