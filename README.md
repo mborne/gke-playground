@@ -1,10 +1,30 @@
 # gke-playground
 
+Expérimentation avec Terraform pour création d'un environnement de développement Kubernetes dans Google Cloud :
+
+![docs/schema.drawio.png](docs/schema.drawio.png)
+
+## Mise en garde
+
+* Testé uniquement avec des bac à sable Google Cloud de [acloud.guru](https://learn.acloud.guru/).
+* Le stockage de l'état Terraform n'est pas traité (voir [backend GCS](https://developer.hashicorp.com/terraform/language/settings/backends/gcs))
+* La segmentation réseau (VPC) n'est pas traitée.
+* Les sauvegardes ne sont pas traitées.
+
+## Principe du déploiement
+
+Le déploiement est réalisé en plusieurs étapes :
+
+* [01-gke](01-gke) : Création du cluster Kubernetes et la production d'un fichier `gke-playground/output/kubeconfig.yml`
+* [02-rwx](02-rwx) : Création d'une instance Google FileStore ("nfs-server") et de la classe de stockage RWX associée ("nfs-legacy")
+* [03-lb](03-rwx) : Déploiement de [Traefik](https://doc.traefik.io/traefik/) avec une IP réservée ("lb-address") et de [cert-manager](https://cert-manager.io/)
+* [04-dns](04-dns) : Configuration du DNS CloudFlare (résolution de `*.gke.{domain}` sur l'IP réservée "{lb-address}")
+
 ## Pré-requis
 
 * Installer [gcloud](https://cloud.google.com/sdk/docs/install) (`gcloud --help`)
 * Installer [terraform](https://developer.hashicorp.com/terraform/downloads) (`terraform version`)
-* Se connecter sur un compte Google Cloud : https://console.cloud.google.com/
+* Se connecter sur un compte Google Cloud sur la console : https://console.cloud.google.com/
 * Se connecter avec gcloud :
 
 ```bash
@@ -12,53 +32,50 @@ gcloud auth login
 gcloud auth application-default login
 ```
 
-## Principe de fonctionnement
+## Déployer l'environnement de développement
 
-* [provider.tf](provider.tf) configure les [modules Terraform](https://registry.terraform.io/browse/providers) :
-  * [Google Cloud](https://registry.terraform.io/providers/hashicorp/google/latest/docs)
-  * [Kubernetes](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs)
-  * [Helm](https://registry.terraform.io/providers/hashicorp/helm/latest/docs)
-* [gke-cluster.tf](gke-cluster.tf) créé un cluster Kubernetes **gke-cluster-primary**
+Voir script [install.sh](install.sh) qui assure :
 
-Pour la mise en oeuvre RWX :
+* Le contrôle de la variable d'environnement `PROJECT_ID`
+* Le contrôle de l'accès au projet Google Cloud correspondant
+* L'activation des services Google Cloud utilisés
+* L'appel de `terraform apply -auto-approve` sur chacun des dossiers
 
-* [nfs-server.tf](nfs-server.tf) assure la création d'un serveur NFS (**nfs-server**)
-* [gke-rwx.tf](gke-rwx.tf) installe [NFS Subdirectory External Provisioner](https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/) pour l'utiliser dans le cluster via la classe de stockage **nfs-legacy**
-
-Pour l'exposition de service en HTTPS :
-
-* [gke-lb.tf](gke-lb.tf) déploie [Traefik](https://github.com/traefik/traefik#overview) en temps que contrôleur ingress avec la classe `traefik` et un résolveur `letsencrypt`.
-
-## Paramétrage
-
-Les paramètres sont spécifiés dans le fichier [variables.tf](variables.tf). Le script [install.sh](install.sh) simplifie le passage et le contrôle des paramètres suivants :
-
-| Nom          | Description                        | Valeur par défaut |
-| ------------ | ---------------------------------- | ----------------- |
-| `PROJECT_ID` | Identifiant du projet Google Cloud | NA (**requise**)  |
-
-Pour les autres paramètres disponibles, il est possible d'utiliser par exemple :
+A l'usage :
 
 ```bash
-export TF_VAR_gke_node_type=e2-micro
-export TF_VAR_gke_node_count=5
-```
-
-## Utilisation
-
-```bash
-# Avec un projet acloudguru
+# Pour install.sh :
 export PROJECT_ID=playground-s-11-946429c5
+# Pour utilisation direct de terraform :
+export TF_VAR_project_id=$PROJECT_ID
+
+# Pour activer 04-dns :
+#export GKE_PLAYGROUND_DOMAIN=your-domain.net
+#export CLOUDFLARE_EMAIL=...
+#export CLOUDFLARE_API_KEY=...
+
 # Création de l'infrastructure avec terraform
 bash install.sh
+```
 
-# Pour inspecter le résultat en ligne de commande :
-gcloud container clusters list --project=$PROJECT_ID
-gcloud compute addresses list --project=$PROJECT_ID
+Remarques :
 
-# Pour configurer kubectl
-ZONE=$(gcloud container clusters describe gke-cluster-primary --project=$PROJECT_ID --format="value(location)")
-gcloud container clusters get-credentials gke-cluster-primary --project=$PROJECT_ID --zone=$ZONE
+* Les paramètres disponibles au niveau des modules terraform sont définis dans le fichiers "variables.tf"
+* Noter que `PROJECT_ID` est traduite en `TF_VAR_project_id` et que ce principe peut être utilisé pour d'autres variables (voir [developer.hashicorp.com - Terraform - Input Variables](https://developer.hashicorp.com/terraform/language/values/variables))
+
+## Utiliser l'environnement de développement
+
+Avec une utilisation classique de Google Cloud :
+
+```bash
+gcloud config set project $PROJECT_ID
+
+gcloud container clusters list
+gcloud compute addresses list
+
+# Pour configurer kubectl (~/.kube/config)
+ZONE=$(gcloud container clusters describe primary --format="value(location)")
+gcloud container clusters get-credentials primary --zone=$ZONE
 
 # Pour tester le fonctionnement :
 kubectl cluster-info

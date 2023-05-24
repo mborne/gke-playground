@@ -1,6 +1,10 @@
 # k8s-traefik
 
-Déploiement de traefik avec le provider helm de Terraform.
+Déploiement de Traefik avec le provider helm de Terraform.
+
+## Principe de fonctionnement
+
+[main.tf](main.tf) assure le déploiement en utilisant le fichier [values.yaml](values.yaml)
 
 ## Accès au dashboard
 

@@ -1,8 +1,12 @@
 #!/bin/bash
 
-echo "------------------------------------------------------------------------------------------------"
-echo "-- Contrôle des paramètres ..."
-echo "------------------------------------------------------------------------------------------------"
+print_block () {
+    echo "------------------------------------------------------------------------------------------------"
+    echo "-- $1"
+    echo "------------------------------------------------------------------------------------------------"
+}
+
+
 
 if [ -z "$PROJECT_ID" ];
 then
@@ -10,62 +14,46 @@ then
     exit 1
 fi
 export TF_VAR_project_id=$PROJECT_ID
-echo "-- PROJECT_ID=$PROJECT_ID"
 
-
-echo "------------------------------------------------------------------------------------------------"
-echo "-- Contrôle de l'accès au projet $PROJECT_ID ..."
-echo "------------------------------------------------------------------------------------------------"
+print_block "Check access to PROJECT_ID=$PROJECT_ID ..."
 gcloud projects describe $PROJECT_ID || {
     echo "Fail to run 'gcloud projects describe $PROJECT_ID' (missing 'gcloud auth login'?)"
     exit 1
 }
-echo "------------------------------------------------------------------------------------------------"
-echo "-- Activation des services Google Cloud ..."
-echo "------------------------------------------------------------------------------------------------"
 
-# Pour le stockage de l'état terraform dans un bucket
-gcloud services enable storage.googleapis.com --project=$PROJECT_ID
-# Kubernetes Engine API
+print_block "Activate Google Cloud services"
+
+echo "-- Kubernetes Engine API ..."
 gcloud services enable container.googleapis.com --project=$PROJECT_ID
-# Cloud Filestore API pour le stockage RWX (NFS managé)
+echo "-- Cloud Filestore API (NFS/RWX) ..."
 gcloud services enable file.googleapis.com --project=$PROJECT_ID
 
-#------------------------------------------------------------------------
-# Création du bucket de stockage de l'état terraform s'il n'existe pas
-# (variables non autorisées dans backend.bucket)
-#------------------------------------------------------------------------
-BUCKET_NAME=${PROJECT_ID}-tf-state
-gcloud storage buckets describe gs://${BUCKET_NAME} || {
-    gcloud storage buckets create gs://${BUCKET_NAME} --public-access-prevention --project=$PROJECT_ID
-}
 
-sleep 5
-
-echo "------------------------------------------------------------------------------------------------"
-echo "-- Déploiement dans ${PROJECT_ID} ..."
-echo "------------------------------------------------------------------------------------------------"
-
-terraform init -backend-config="bucket=${PROJECT_ID}-tf-state"
-terraform plan
+print_block "01-gke ..."
+cd 01-gke
+terraform init
 terraform apply -auto-approve
+cd ..
 
-echo "------------------------------------------------------------------------------------------------"
-echo "-- Export de la configuration"
-echo "------------------------------------------------------------------------------------------------"
-echo "# output/config.env :"
-cat output/config.env
+print_block "02-rwx (nfs-server & nfs-external-subdir-provider)..."
+cd 02-rwx
+terraform init
+terraform apply -auto-approve
+cd ..
 
-echo "------------------------------------------------------------------------------------------------"
-echo "-- Utilisation du cluster :"
-echo "------------------------------------------------------------------------------------------------"
-echo "source output/config.env"
-source output/config.env
+print_block "03-lb (traefik & cert-manager) ..."
+cd 03-lb
+terraform init
+terraform apply -auto-approve
+cd ..
 
-# echo 'gcloud container clusters get-credentials gke-cluster-primary --project=$PROJECT_ID --zone=$ZONE'
-# gcloud container clusters get-credentials gke-cluster-primary --project=$PROJECT_ID --zone=$ZONE
-
-export KUBECONFIG=$PWD/output/kubeconfig
-echo 'kubectl get nodes'
-kubectl get nodes
-
+if [ ! -z "$GKE_PLAYGROUND_DOMAIN" ];
+then
+    print_block "04-dns (cloudflare DNS : *.gke.${GKE_PLAYGROUND_DOMAIN})..."
+    cd 04-dns
+    terraform init
+    terraform apply -auto-approve -var dns_domain=$GKE_PLAYGROUND_DOMAIN
+    cd ..
+else
+    print_block "04-dns (cloudflare DNS) : skipped (GKE_PLAYGROUND_DOMAIN is required)"
+fi

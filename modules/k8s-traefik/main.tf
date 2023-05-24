@@ -6,7 +6,7 @@ resource "kubernetes_namespace" "traefik" {
 
 resource "helm_release" "traefik" {
   name      = "traefik"
-  namespace = "traefik-system"
+  namespace = kubernetes_namespace.traefik.id
 
   repository = "https://traefik.github.io/charts/"
   chart      = "traefik"

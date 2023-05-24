@@ -1,34 +1,6 @@
-#------------------------------------------------------------------------------------------
-# helm values to generate LetsEncrypt certificates using HTTP-01 
-# challenge (https://letsencrypt.org/docs/challenge-types/#http-01-challenge)
-#  
-# see https://github.com/traefik/traefik-helm-chart/blob/master/traefik/values.yaml
-#------------------------------------------------------------------------------------------
-
 deployment:
   replicas: 3
 
-podSecurityContext:
-  fsGroup: 65532
-
 ingressClass:
-  #enabled: true
-  isDefaultClass: false
-
-# Enable persistence using Persistent Volume Claims to persist TLS certificates.
-persistence:
   enabled: true
-  name: data
-  accessMode: ReadWriteMany
-  size: 128Mi
-  storageClass: "nfs-legacy"
-  path: /data
-  annotations: {}
-
-certResolvers:
-  letsencrypt:
-    email: admin@quadtreeworld.net
-    tlsChallenge: true
-    httpChallenge:
-      entryPoint: "web"
-    storage: /data/acme.json
+  isDefaultClass: false
