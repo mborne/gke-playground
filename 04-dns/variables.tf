@@ -9,3 +9,10 @@ variable "region_name" {
   default     = "us-central1"
   description = "La region de déploiement des services (ex : us-central1)"
 }
+
+variable "dns_domain" {
+  type = string
+  #default = "quadtreeworld.net"
+  nullable = false
+  description = "Domaine pour création des entrées *.gke et lb-gke (doit correspondre à une zone CloudFlare)"
+}

@@ -12,8 +12,3 @@ module "traefik" {
 module "cert_manager" {
   source = "../modules/k8s-cert-manager"
 }
-
-module "whoami" {
-  source = "../modules/k8s-whoami"
-}
-

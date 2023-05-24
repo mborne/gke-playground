@@ -32,40 +32,56 @@ gcloud auth login
 gcloud auth application-default login
 ```
 
-## Paramétrage
-
-* Les paramètres disponibles au niveau des modules terraform sont définis dans le fichiers "variables.tf".
-* La variable `project_id` correspondant au projet Google Cloud cible est requise pour l'ensemble des modules.
-
 ## Déployer l'environnement de développement
 
-Voir script [install.sh](install.sh) qui assure l'appel de `terraform apply -auto-approve` sur chacun des dossiers avec contrôle et passage des paramètres :
+Voir script [install.sh](install.sh) qui assure :
+
+* Le contrôle de la variable d'environnement `PROJECT_ID`
+* Le contrôle de l'accès au projet Google Cloud correspondant
+* L'activation des services Google Cloud utilisés
+* L'appel de `terraform apply -auto-approve` sur chacun des dossiers
+
+A l'usage :
 
 ```bash
-# Avec un projet acloudguru
+# Pour install.sh :
 export PROJECT_ID=playground-s-11-946429c5
+# Pour utilisation direct de terraform :
+export TF_VAR_project_id=$PROJECT_ID
+
+# Pour activer 04-dns :
+#export GKE_PLAYGROUND_DOMAIN=your-domain.net
+#export CLOUDFLARE_EMAIL=...
+#export CLOUDFLARE_API_KEY=...
+
 # Création de l'infrastructure avec terraform
-# (NB : PROJECT_ID sera traduit en TF_VAR_project_id)
 bash install.sh
 ```
 
+Remarques :
+
+* Les paramètres disponibles au niveau des modules terraform sont définis dans le fichiers "variables.tf"
+* Noter que `PROJECT_ID` est traduite en `TF_VAR_project_id` et que ce principe peut être utilisé pour d'autres variables (voir [developer.hashicorp.com - Terraform - Input Variables](https://developer.hashicorp.com/terraform/language/values/variables))
+
 ## Utiliser l'environnement de développement
 
-```bash
-# Pour inspecter le résultat en ligne de commande :
-gcloud container clusters list --project=$PROJECT_ID
-gcloud compute addresses list --project=$PROJECT_ID
+Avec une utilisation classique de Google Cloud :
 
-# Pour configurer kubectl
-ZONE=$(gcloud container clusters describe gke-cluster-primary --project=$PROJECT_ID --format="value(location)")
-gcloud container clusters get-credentials gke-cluster-primary --project=$PROJECT_ID --zone=$ZONE
+```bash
+gcloud config set project $PROJECT_ID
+
+gcloud container clusters list
+gcloud compute addresses list
+
+# Pour configurer kubectl (~/.kube/config)
+ZONE=$(gcloud container clusters describe primary --format="value(location)")
+gcloud container clusters get-credentials primary --zone=$ZONE
 
 # Pour tester le fonctionnement :
 kubectl cluster-info
 kubectl get nodes
 kubectl get namespaces
 ```
-
 
 ## License
 

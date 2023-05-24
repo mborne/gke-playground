@@ -9,9 +9,3 @@ variable "region_name" {
   default     = "us-central1"
   description = "La region de déploiement des services (ex : us-central1)"
 }
-
-variable "zone_name" {
-  type        = string
-  default     = "us-central1-c"
-  description = "La zone de déploiement des services (ex : us-central1-c)"
-}
