@@ -11,6 +11,15 @@ Expérimentation avec Terraform pour création d'un environnement de développem
 * La segmentation réseau (VPC) n'est pas traitée.
 * Les sauvegardes ne sont pas traitées.
 
+## Principe du déploiement
+
+Le déploiement est réalisé en plusieurs étapes :
+
+* [01-gke](01-gke) : Création du cluster Kubernetes et la production d'un fichier `gke-playground/output/kubeconfig.yml`
+* [02-rwx](02-rwx) : Création d'une instance Google FileStore ("nfs-server") et de la classe de stockage RWX associée ("nfs-legacy")
+* [03-lb](03-rwx) : Déploiement de [Traefik](https://doc.traefik.io/traefik/) avec une IP réservée ("lb-address") et de [cert-manager](https://cert-manager.io/)
+* [04-dns](04-dns) : Configuration du DNS CloudFlare (résolution de `*.gke.{domain}` sur l'IP réservée "{lb-address}")
+
 ## Pré-requis
 
 * Installer [gcloud](https://cloud.google.com/sdk/docs/install) (`gcloud --help`)
@@ -23,14 +32,10 @@ gcloud auth login
 gcloud auth application-default login
 ```
 
-## Principe du déploiement
+## Paramétrage
 
-Le déploiement est réalisé en plusieurs étapes :
-
-* [01-gke](01-gke) : Création du cluster Kubernetes et la production d'un fichier `gke-playground/output/kubeconfig.yml`
-* [02-rwx](02-rwx) : Création d'une instance Google FileStore ("nfs-server") et de la classe de stockage RWX associée ("nfs-legacy")
-* [03-lb](03-rwx) : Déploiement de [Traefik](https://doc.traefik.io/traefik/) avec une IP réservée ("lb-address") et de [cert-manager](https://cert-manager.io/)
-* [04-dns](04-dns) : Configuration du DNS CloudFlare (résolution de `*.gke.{domain}` sur l'IP réservée "{lb-address}")
+* Les paramètres disponibles au niveau des modules terraform sont définis dans le fichiers "variables.tf".
+* La variable `project_id` correspondant au projet Google Cloud cible est requise pour l'ensemble des modules.
 
 ## Déployer l'environnement de développement
 
