@@ -6,8 +6,6 @@ print_block () {
     echo "------------------------------------------------------------------------------------------------"
 }
 
-
-
 if [ -z "$PROJECT_ID" ];
 then
     echo "PROJECT_ID is required!"
@@ -41,19 +39,23 @@ terraform init
 terraform apply -auto-approve
 cd ..
 
-print_block "03-lb (traefik & cert-manager) ..."
+
+LB_OPTS=""
+if [ ! -z "$GKE_PLAYGROUND_DOMAIN" ];
+then
+    LB_OPTS="-var external_dns_enabled=true"
+    LB_OPTS="${LB_OPTS} -var cloudflare_api_key=$CLOUDFLARE_API_KEY"
+    LB_OPTS="${LB_OPTS} -var cloudflare_email=$CLOUDFLARE_EMAIL"
+    LB_OPTS="${LB_OPTS} -var cloudflare_zone_id=$CLOUDFLARE_ZONE_ID"
+else
+    echo "external-dns : skipped (GKE_PLAYGROUND_DOMAIN is required)"
+    LB_OPTS="-var external_dns_enabled=false"
+fi
+
+print_block "03-lb (traefik, cert-manager and external-dns) ..."
 cd 03-lb
 terraform init
 terraform apply -auto-approve
 cd ..
 
-if [ ! -z "$GKE_PLAYGROUND_DOMAIN" ];
-then
-    print_block "04-dns (cloudflare DNS : *.gke.${GKE_PLAYGROUND_DOMAIN})..."
-    cd 04-dns
-    terraform init
-    terraform apply -auto-approve -var dns_domain=$GKE_PLAYGROUND_DOMAIN
-    cd ..
-else
-    print_block "04-dns (cloudflare DNS) : skipped (GKE_PLAYGROUND_DOMAIN is required)"
-fi
+
