@@ -7,6 +7,7 @@ module "traefik" {
   source = "../modules/k8s-ingress-nginx"
 
   load_balancer_ip = google_compute_address.lb_address.address
+  dns_domain       = var.dns_domain
 }
 
 module "cert_manager" {
@@ -17,7 +18,6 @@ module "external_dns" {
   count = var.external_dns_enabled ? 1 : 0
 
   source             = "../modules/k8s-external-dns"
-  dns_domain         = var.dns_domain
   cloudflare_api_key = var.cloudflare_api_key
   cloudflare_email   = var.cloudflare_email
   cloudflare_zone_id = var.cloudflare_zone_id

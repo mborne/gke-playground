@@ -40,22 +40,24 @@ terraform apply -auto-approve
 cd ..
 
 
+print_block "03-lb (traefik, cert-manager and external-dns) ..."
+
 LB_OPTS=""
 if [ ! -z "$GKE_PLAYGROUND_DOMAIN" ];
 then
+    echo "-- external-dns : enabled (GKE_PLAYGROUND_DOMAIN=$GKE_PLAYGROUND_DOMAIN)"
     LB_OPTS="-var external_dns_enabled=true"
     LB_OPTS="${LB_OPTS} -var cloudflare_api_key=$CLOUDFLARE_API_KEY"
     LB_OPTS="${LB_OPTS} -var cloudflare_email=$CLOUDFLARE_EMAIL"
     LB_OPTS="${LB_OPTS} -var cloudflare_zone_id=$CLOUDFLARE_ZONE_ID"
 else
-    echo "external-dns : skipped (GKE_PLAYGROUND_DOMAIN is required)"
+    echo "-- external-dns : skipped (GKE_PLAYGROUND_DOMAIN is required)"
     LB_OPTS="-var external_dns_enabled=false"
 fi
 
-print_block "03-lb (traefik, cert-manager and external-dns) ..."
 cd 03-lb
 terraform init
-terraform apply -auto-approve
+terraform apply $LB_OPTS -auto-approve 
 cd ..
 
 

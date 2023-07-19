@@ -82,8 +82,12 @@ resource "kubernetes_deployment" "external_dns" {
             "--cloudflare-dns-records-per-page=5000"
           ]
           env {
-            CF_API_KEY = var.cloudflare_api_key
-            CF_API_EMAIL = var.cloudflare_email
+              name  = "CF_API_KEY"
+              value = var.cloudflare_api_key
+          }
+          env {
+              name  = "CF_API_EMAIL"
+              value = var.cloudflare_email
           }
         }
       }
