@@ -17,8 +17,7 @@ Le déploiement est réalisé en plusieurs étapes :
 
 * [01-gke](01-gke) : Création du cluster Kubernetes et la production d'un fichier `gke-playground/output/kubeconfig.yml`
 * [02-rwx](02-rwx) : Création d'une instance Google FileStore ("nfs-server") et de la classe de stockage RWX associée ("nfs-legacy")
-* [03-lb](03-lb) : Déploiement de [Traefik](https://doc.traefik.io/traefik/) avec une IP réservée ("lb-address") et de [cert-manager](https://cert-manager.io/)
-* [04-dns](04-dns) : Configuration du DNS CloudFlare (résolution de `*.gke.{domain}` sur l'IP réservée "{lb-address}")
+* [03-lb](03-lb) : Déploiement de [Traefik](https://doc.traefik.io/traefik/) avec une IP réservée ("lb-address"), de [external-dns](https://github.com/kubernetes-sigs/external-dns) et de [cert-manager](https://cert-manager.io/)
 
 ## Pré-requis
 
@@ -50,7 +49,7 @@ export PROJECT_ID=playground-s-11-946429c5
 export TF_VAR_project_id=$PROJECT_ID
 
 # Pour activer 04-dns :
-#export GKE_PLAYGROUND_DOMAIN=your-domain.net
+#export GKE_PLAYGROUND_DOMAIN=gke.your-domain.net
 #export CLOUDFLARE_EMAIL=...
 #export CLOUDFLARE_API_KEY=...
 
@@ -63,9 +62,20 @@ Remarques :
 * Les paramètres disponibles au niveau des modules terraform sont définis dans le fichiers "variables.tf"
 * Noter que `PROJECT_ID` est traduite en `TF_VAR_project_id` et que ce principe peut être utilisé pour d'autres variables (voir [developer.hashicorp.com - Terraform - Input Variables](https://developer.hashicorp.com/terraform/language/values/variables))
 
-## Utiliser l'environnement de développement
+## Accès au cluster Kubernetes
 
-Avec une utilisation classique de Google Cloud :
+### Avec kubeconfig généré par Terraform
+
+```bash
+export KUBECONFIG=$PWD/output/kubeconfig
+
+# Pour tester le fonctionnement :
+kubectl cluster-info
+kubectl get nodes
+kubectl get namespaces
+```
+
+### Avec une utilisation classique de Google Cloud
 
 ```bash
 gcloud config set project $PROJECT_ID
