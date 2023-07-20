@@ -13,7 +13,7 @@ variable "region_name" {
 
 variable "dns_domain" {
   type        = string
-  default     = "lb.cluster.local"
+  default     = "gke.cluster.local"
   description = "Domaine pour création de l'entrée lb.{dns_domain} via l'annotation external-dns.alpha.kubernetes.io/hostname"
 }
 

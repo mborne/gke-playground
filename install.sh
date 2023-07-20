@@ -47,6 +47,7 @@ if [ ! -z "$GKE_PLAYGROUND_DOMAIN" ];
 then
     echo "-- external-dns : enabled (GKE_PLAYGROUND_DOMAIN=$GKE_PLAYGROUND_DOMAIN)"
     LB_OPTS="-var external_dns_enabled=true"
+    LB_OPTS="${LB_OPTS} -var dns_domain=$GKE_PLAYGROUND_DOMAIN"
     LB_OPTS="${LB_OPTS} -var cloudflare_api_key=$CLOUDFLARE_API_KEY"
     LB_OPTS="${LB_OPTS} -var cloudflare_email=$CLOUDFLARE_EMAIL"
     LB_OPTS="${LB_OPTS} -var cloudflare_zone_id=$CLOUDFLARE_ZONE_ID"

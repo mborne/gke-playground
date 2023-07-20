@@ -70,7 +70,7 @@ resource "kubernetes_deployment" "external_dns" {
       }
 
       spec {
-        service_account_name = "external-dns-viewer"
+        service_account_name = "external-dns"
         container {
           image = "registry.k8s.io/external-dns/external-dns:v0.13.5"
           name  = "external-dns"

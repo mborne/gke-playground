@@ -3,7 +3,7 @@ resource "google_compute_address" "lb_address" {
   name = "lb-address"
 }
 
-module "traefik" {
+module "ingress_nginx" {
   source = "../modules/k8s-ingress-nginx"
 
   load_balancer_ip = google_compute_address.lb_address.address
