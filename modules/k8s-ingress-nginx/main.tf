@@ -13,6 +13,5 @@ resource "helm_release" "ingress_nginx" {
 
   values = [templatefile("${path.module}/templates/values.yaml.tpl", {
     load_balancer_ip = var.load_balancer_ip
-    dns_domain       = var.dns_domain
   })]
 }

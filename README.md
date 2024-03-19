@@ -48,11 +48,6 @@ export PROJECT_ID=playground-s-11-946429c5
 # Pour utilisation direct de terraform :
 export TF_VAR_project_id=$PROJECT_ID
 
-# Pour activer 04-dns :
-#export GKE_PLAYGROUND_DOMAIN=gke.your-domain.net
-#export CLOUDFLARE_EMAIL=...
-#export CLOUDFLARE_API_KEY=...
-
 # Création de l'infrastructure avec terraform
 bash install.sh
 ```
