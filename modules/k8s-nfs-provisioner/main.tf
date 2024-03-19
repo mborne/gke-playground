@@ -8,7 +8,6 @@ resource "helm_release" "nfs_provisionner" {
   name      = "nfs-subdir-external-provisioner"
   namespace = kubernetes_namespace.nfs_provisionner.id
 
-  # helm repo add nfs-subdir-external-provisioner https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/
   repository = "https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/"
   chart      = "nfs-subdir-external-provisioner"
 

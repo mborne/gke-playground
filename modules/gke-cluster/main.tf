@@ -1,12 +1,3 @@
-terraform {
-  required_providers {
-    google = {
-      source  = "hashicorp/google"
-      version = ">=4.65"
-    }
-  }
-}
-
 # Récupération du compte de service par défaut Compute Engine Service Account pour les noeuds
 # (roles/monitoring.metricWriter et roles/logging.logWriter requis, non assignable avec 
 # google_project_iam_binding avec acloudguru)
@@ -17,6 +8,9 @@ data "google_compute_default_service_account" "default" {
 resource "google_container_cluster" "primary" {
   name     = var.cluster_name
   location = var.zone_name
+  #network  = "gke"
+
+  deletion_protection = false
 
   # Création d'un nombre minimal de noeud en vue de créer des pools séparés
   remove_default_node_pool = true
