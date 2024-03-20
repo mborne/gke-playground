@@ -37,28 +37,21 @@ gcloud storage buckets describe gs://${TF_BUCKET_NAME}  --project=$PROJECT_ID ||
 }
 
 
-print_block "01-networks ..."
-cd 01-networks
+print_block "01-gke ..."
+cd 01-gke
 terraform init -backend-config="bucket=${TF_BUCKET_NAME}"
 terraform apply -auto-approve
 cd ..
 
-print_block "02-gke ..."
-cd 02-gke
+print_block "02-lb (nginx-ingress-controller) ..."
+cd 02-lb
 terraform init -backend-config="bucket=${TF_BUCKET_NAME}"
-terraform apply -auto-approve
+terraform apply -auto-approve 
 cd ..
 
 print_block "03-rwx (nfs-server & nfs-external-subdir-provider)..."
 cd 03-rwx
 terraform init -backend-config="bucket=${TF_BUCKET_NAME}"
 terraform apply -auto-approve
-cd ..
-
-
-print_block "04-lb (nginx-ingress-controller) ..."
-cd 04-lb
-terraform init -backend-config="bucket=${TF_BUCKET_NAME}"
-terraform apply -auto-approve 
 cd ..
 
