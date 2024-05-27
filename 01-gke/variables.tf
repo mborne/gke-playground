@@ -24,7 +24,7 @@ variable "gke_cluster_name" {
 
 variable "gke_node_type" {
   type        = string
-  default     = "e2-small"
+  default     = "n1-standard-1"
   description = "Le dimensionnement des noeuds du cluster Kubernetes"
 }
 
