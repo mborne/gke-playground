@@ -3,9 +3,26 @@ variable "load_balancer_ip" {
   nullable    = false
 }
 
-variable "dns_domain" {
-  type = string
-  nullable = false
-  description = "Domaine pour création de l'entrée lb.{dns_domain} ( external-dns.alpha.kubernetes.io/hostname )"
+variable "namespace_name" {
+  type        = string
+  nullable    = false
+  default     = "ingress-nginx"
+  description = "Le namespace de déploiement de nginx-ingress-controller"
 }
+
+variable "ingress_class_name" {
+  type        = string
+  nullable    = false
+  default     = "nginx"
+  description = "Le nom de la ressource IngressClass"
+}
+
+variable "chart_version" {
+  type        = string
+  nullable    = false
+  default     = "11.0.0"
+  description = "La version du chart bitnami/nginx-ingress-controller"
+}
+
+
 

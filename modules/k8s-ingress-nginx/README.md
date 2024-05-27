@@ -9,4 +9,10 @@ Déploiement de [nginx-ingress-controller](https://bitnami.com/stack/nginx-ingre
 ## Ressources
 
 * [bitnami/nginx-ingress-controller - parameters](https://github.com/bitnami/charts/tree/main/bitnami/nginx-ingress-controller/#parameters)
+* Use following commands to list available versions :
 
+```bash
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo update
+helm search repo bitnami/nginx-ingress-controller --versions
+```
