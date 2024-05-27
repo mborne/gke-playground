@@ -62,7 +62,7 @@ Remarques :
 ### Avec kubeconfig généré par Terraform
 
 ```bash
-export KUBECONFIG=$PWD/output/kubeconfig
+export KUBECONFIG=$PWD/output/kubeconfig.yaml
 
 # Pour tester le fonctionnement :
 kubectl cluster-info

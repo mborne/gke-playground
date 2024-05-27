@@ -40,18 +40,32 @@ gcloud storage buckets describe gs://${TF_BUCKET_NAME}  --project=$PROJECT_ID ||
 print_block "01-gke ..."
 cd 01-gke
 terraform init -backend-config="bucket=${TF_BUCKET_NAME}"
-terraform apply -auto-approve
+terraform apply -auto-approve || {
+    echo "failure in 01-gke"
+    exit 1
+}
 cd ..
 
 print_block "02-lb (nginx-ingress-controller) ..."
 cd 02-lb
 terraform init -backend-config="bucket=${TF_BUCKET_NAME}"
-terraform apply -auto-approve 
+terraform apply -auto-approve|| {
+    echo "failure in 02-lb"
+    exit 1
+}
 cd ..
 
-print_block "03-rwx (nfs-server & nfs-external-subdir-provider)..."
-cd 03-rwx
-terraform init -backend-config="bucket=${TF_BUCKET_NAME}"
-terraform apply -auto-approve
-cd ..
+RWX_ENABLED=${RWX_ENABLED:-0}
+if [ "$RWX_ENABLED" = "1" ];
+then
+    print_block "03-rwx (nfs-server & nfs-external-subdir-provider)..."
+    cd 03-rwx
+    terraform init -backend-config="bucket=${TF_BUCKET_NAME}"
+    terraform apply -auto-approve
+    cd ..
+else
+    print_block "03-rwx (nfs-server & nfs-external-subdir-provider) : skipped (RWX_ENABLED=0)"
+fi
+
+
 

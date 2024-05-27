@@ -12,27 +12,10 @@ resource "google_container_cluster" "primary" {
 
   deletion_protection = false
 
-  # Création d'un nombre minimal de noeud en vue de créer des pools séparés
-  remove_default_node_pool = true
-  initial_node_count       = 1
-
-  # logging_service          = "logging.googleapis.com/kubernetes"
-  # monitoring_service       = "monitoring.googleapis.com/kubernetes"
-  logging_config {
-    enable_components = ["SYSTEM_COMPONENTS", "WORKLOADS"]
-  }
-  monitoring_config {
-    enable_components = ["SYSTEM_COMPONENTS"]
-  }
-}
-
-
-# Création d'un pool de noeud pour le cluster Kubernetes
-resource "google_container_node_pool" "default" {
-  name       = "default-node-pool"
-  location   = var.zone_name
-  cluster    = google_container_cluster.primary.name
-  node_count = var.node_count
+  # Utilisation du seul pool de noeud par défaut
+  initial_node_count = var.node_count
+  # NB : recommandé de le supprimer en règle générale
+  remove_default_node_pool = false
 
   node_config {
     preemptible  = false
@@ -44,4 +27,13 @@ resource "google_container_node_pool" "default" {
       "https://www.googleapis.com/auth/cloud-platform"
     ]
   }
+
+  logging_config {
+    enable_components = ["SYSTEM_COMPONENTS", "WORKLOADS"]
+  }
+
+  monitoring_config {
+    enable_components = ["SYSTEM_COMPONENTS"]
+  }
 }
+
