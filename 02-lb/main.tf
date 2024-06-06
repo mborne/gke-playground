@@ -23,3 +23,37 @@ module "ingress_nginx" {
 module "cert_manager" {
   source = "../modules/k8s-cert-manager"
 }
+
+
+resource "kubernetes_manifest" "clusterissuer_letsencrypt" {
+  count = var.letsencrypt_email != "" ? 1 : 0
+
+  manifest = {
+    "apiVersion" = "cert-manager.io/v1"
+    "kind" = "ClusterIssuer"
+    "metadata" = {
+      "name" = "letsencrypt"
+    }
+    "spec" = {
+      "acme" = {
+        "email" = var.letsencrypt_email
+        "privateKeySecretRef" = {
+          "name" = "letsencrypt"
+        }
+        "server" = "https://acme-v02.api.letsencrypt.org/directory"
+        "solvers" = [
+          {
+            "http01" = {
+              "ingress" = {
+                "class" = "nginx"
+              }
+            }
+          },
+        ]
+      }
+    }
+  }
+
+  depends_on = [module.cert_manager]
+}
+

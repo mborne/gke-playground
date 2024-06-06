@@ -13,5 +13,11 @@ variable "region_name" {
 variable "zone_name" {
   type        = string
   default     = "us-central1-c"
-  description = "La zone de déploiement des services (ex : us-central1-c)"
+  description = "La zone de déploiement des services"
+}
+
+variable "gke_cluster_name" {
+  type        = string
+  default     = "primary"
+  description = "Le nom du cluster Kubernetes"
 }

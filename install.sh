@@ -1,5 +1,8 @@
 #!/bin/bash
 
+hash terraform 2>/dev/null || { echo >&2 "terraform required."; exit 1; }
+hash gcloud 2>/dev/null || { echo >&2 "gcloud CLI required."; exit 1; }
+
 print_block () {
     echo "------------------------------------------------------------------------------------------------"
     echo "-- $1"

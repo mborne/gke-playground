@@ -48,6 +48,9 @@ export PROJECT_ID=playground-s-11-946429c5
 # Pour utilisation direct de terraform :
 export TF_VAR_project_id=$PROJECT_ID
 
+# Pour activer la création du ClusterIssuer LetsEncrypt :
+#export TF_VAR_letsencrypt_email=votre-email@exemple.fr
+
 # Création de l'infrastructure avec terraform
 bash install.sh
 ```
@@ -86,6 +89,23 @@ gcloud container clusters get-credentials primary --zone=$ZONE
 kubectl cluster-info
 kubectl get nodes
 kubectl get namespaces
+```
+
+
+## Utilisation avec docker-devbox
+
+Par exemple :
+
+```bash
+export KUBECONFIG=$PWD/output/kubeconfig.yaml
+
+# Pour https://whoami.gke.quadtreeworld.net
+export DEVBOX_HOSTNAME=gke.quadtreeworld.net
+export DEVBOX_ISSUER=letsencrypt
+export DEVBOX_INGRESS=nginx
+
+git clone https://github.com/mborne/docker-devbox
+bash docker-devbox/whoami/k8s-install.sh
 ```
 
 ## License
