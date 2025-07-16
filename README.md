@@ -17,7 +17,7 @@ Le déploiement est réalisé en plusieurs étapes :
 
 * [01-gke](01-gke) : Création du cluster Kubernetes et la production d'un fichier `gke-playground/output/kubeconfig.yml`
 * [02-rwx](02-rwx) : Création d'une instance Google FileStore ("nfs-server") et de la classe de stockage RWX associée ("nfs-legacy")
-* [03-lb](03-lb) : Déploiement de [Traefik](https://doc.traefik.io/traefik/) avec une IP réservée ("lb-address"), de [external-dns](https://github.com/kubernetes-sigs/external-dns) et de [cert-manager](https://cert-manager.io/)
+* [03-lb](03-lb) : Déploiement de [ingress-nginx-controller](https://github.com/kubernetes/ingress-nginx?tab=readme-ov-file#ingress-nginx-controller) avec une IP réservée ("lb-address")
 
 ## Pré-requis
 
@@ -47,9 +47,6 @@ A l'usage :
 export PROJECT_ID=playground-s-11-946429c5
 # Pour utilisation direct de terraform :
 export TF_VAR_project_id=$PROJECT_ID
-
-# Pour activer la création du ClusterIssuer LetsEncrypt :
-#export TF_VAR_letsencrypt_email=votre-email@exemple.fr
 
 # Création de l'infrastructure avec terraform
 bash install.sh
@@ -101,7 +98,7 @@ export KUBECONFIG=$PWD/output/kubeconfig.yaml
 
 # Pour https://whoami.gke.quadtreeworld.net
 export DEVBOX_HOSTNAME=gke.quadtreeworld.net
-export DEVBOX_ISSUER=letsencrypt
+export DEVBOX_ISSUER=letsencrypt-cloudflare
 export DEVBOX_INGRESS=nginx
 
 git clone https://github.com/mborne/docker-devbox

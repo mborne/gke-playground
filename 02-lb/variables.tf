@@ -21,10 +21,3 @@ variable "gke_cluster_name" {
   default     = "primary"
   description = "Le nom du cluster Kubernetes"
 }
-
-variable "letsencrypt_email" {
-  type        = string
-  default     = ""
-  description = "L'adresse email pour la création de certificat LetsEncrypt"
-}
-
