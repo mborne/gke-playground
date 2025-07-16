@@ -98,10 +98,16 @@ export KUBECONFIG=$PWD/output/kubeconfig.yaml
 
 # Pour https://whoami.gke.quadtreeworld.net
 export DEVBOX_HOSTNAME=gke.quadtreeworld.net
-export DEVBOX_ISSUER=letsencrypt-cloudflare
+export DEVBOX_ISSUER=letsencrypt-http
 export DEVBOX_INGRESS=nginx
 
 git clone https://github.com/mborne/docker-devbox
+
+# déploiement de cert-manager
+bash docker-devbox/cert-manager/k8s-install.sh
+bash docker-devbox/cert-manager/cluster-issuer/letsencrypt-http.sh <CONTACT_EMAIL>
+
+# déploiement de whoami
 bash docker-devbox/whoami/k8s-install.sh
 ```
 
